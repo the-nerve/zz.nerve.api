@@ -1,0 +1,14 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "baseUrl": "",
+        "paths": {
+            "@nerve/cms/*": [
+                "./cms/*"
+            ],
+            "@nerve/global/*": [
+                "./global/*"
+            ],
+        }
+    }
+}

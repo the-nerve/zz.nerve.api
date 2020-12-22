@@ -1,11 +1,74 @@
 {
-  "name": "begin-app",
-  "version": "0.0.0",
-  "description": "A simple Begin app with the minimum necessary file structure",
+  "name": "nerve.api",
+  "version": "1.0.0",
+  "description": "A behind-the-scenes, serverless API for The Nerve Theatre",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/the-nerve/nerve.api.git"
+  },
+  "author": "Chris Hahn <chris@chrishahn.me>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/the-nerve/nerve.api/issues"
+  },
+  "homepage": "https://github.com/the-nerve/nerve.api#readme",
   "scripts": {
-    "start": "npx sandbox"
+    "build": "npx tsc",
+    "start": "npm run build && npx sandbox",
+    "deploy": "npm run build && npx deploy",
+    "deploy:dry": "npm run build && npx deploy --dry-run",
+    "deploy:prod": "npm run build && npx deploy production",
+    "clean:rebuild": "rimraf node_modules && npm install",
+    "clean:nuke:rebuild": "rimraf package-lock.json && rimraf node_modules && npm install",
+    "lint": "eslint . --cache --cache-location node_modules/.cache/eslint --ext ts",
+    "lint:fix": "eslint . --cache --cache-location node_modules/.cache/eslint --ext ts --fix",
+    "lint:clean": "rimraf node_modules/.cache/eslint",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@architect/architect": "^8.4.4",
+    "@sanity/client": "^2.1.0"
   },
   "devDependencies": {
-    "@architect/sandbox": "^3.3"
+    "@architect/sandbox": "^3.3",
+    "@codingwithchris/eslint-config": "^1.0.6",
+    "@types/aws-lambda": "^8.10.66",
+    "@types/node": "^14.14.14",
+    "@typescript-eslint/eslint-plugin": "^4.10.0",
+    "@typescript-eslint/parser": "^4.10.0",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^7.15.0",
+    "eslint-config-airbnb": "^18.2.1",
+    "eslint-config-airbnb-typescript": "^12.0.0",
+    "eslint-config-prettier": "^6.15.0",
+    "eslint-plugin-html": "^6.1.1",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-json": "^2.1.2",
+    "eslint-plugin-jsx-a11y": "^6.4.1",
+    "eslint-plugin-prettier": "^3.3.0",
+    "eslint-plugin-react": "^7.21.5",
+    "husky": "^4.3.6",
+    "lint-staged": "^10.5.3",
+    "prettier": "^2.2.1",
+    "rimraf": "^3.0.2",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.1.3"
+  },
+  "eslintIgnore": [
+    "node_modules/",
+    ".github/",
+    ".cache/",
+    ".serverless/"
+  ],
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.ts": [
+      "npm run lint:fix",
+      "git add"
+    ]
   }
 }

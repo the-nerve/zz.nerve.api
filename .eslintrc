@@ -1,0 +1,18 @@
+{
+    "extends": [
+        "@codingwithchris/eslint-config/vanilla-typescript"
+    ],
+    "overrides": [],
+    "rules": {
+        "no-shadow": "off",
+        "@typescript-eslint/naming-convention": [
+            "error",
+            {
+                "selector": "enum",
+                "format": [
+                    "UPPER_CASE"
+                ]
+            }
+        ]
+    }
+}
