@@ -1,1 +1,5 @@
-export type Response = Promise<{ body: string }>;
+export type Response = Promise<{
+    statusCode: number;
+    message: string;
+    body: string;
+}>;

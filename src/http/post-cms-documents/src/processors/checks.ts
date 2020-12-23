@@ -1,9 +1,9 @@
-import { SANITY_EVENTS } from '@nerve/cms/constants';
+import { SANITY_EVENTS } from '../constants';
 import {
     AvailableSanityEventHook,
     SanityDocumentEvents,
     Processors,
-} from '@nerve/cms/types';
+} from '../types';
 
 /**
  *

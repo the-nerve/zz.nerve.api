@@ -8,8 +8,8 @@ export interface SanityDocumentEvents {
 }
 
 export interface SanityCMSWebhook {
-    transactionID: string;
-    projectID: string;
+    transactionId: string;
+    projectId: string;
     dataset: string;
     ids: SanityDocumentEvents;
 }

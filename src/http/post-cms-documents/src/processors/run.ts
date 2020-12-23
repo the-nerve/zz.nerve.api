@@ -1,17 +1,17 @@
-import { SANITY_EVENTS, SANITY_EVENT_HOOKS } from '@nerve/cms/constants';
+import { SANITY_EVENTS, SANITY_EVENT_HOOKS } from '../constants';
 import {
     DocumentID,
     SanityDocumentEvents,
     EventHookMappings,
     EventProcessors,
     AvailableSanityEventHook,
-} from '@nerve/cms/types';
+} from '../types';
 
 import {
     onCreateProcessors,
     onDeleteProcessors,
     onUpdateProcessors,
-} from '@nerve/cms/eventHooks';
+} from '../eventHooks';
 import { hasProcessorsToRunOnHook } from './checks';
 
 /**

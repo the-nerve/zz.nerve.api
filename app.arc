@@ -1,5 +1,5 @@
 @app
-begin-app
+nerve-api
 
 @static
 folder public

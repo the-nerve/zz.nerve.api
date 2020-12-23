@@ -1,4 +1,4 @@
-import { Processors } from '@nerve/cms/types';
+import { Processors } from '../types';
 
 /**
  *
