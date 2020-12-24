@@ -1,11 +1,11 @@
-import { Request, Response } from '../../shared/global/types';
+import { PostRequest, Response } from '../../shared/global/types';
 
 import { isValidProject } from './src/validators';
 import { hasDocumentsToProcess, runDocumentProcessors } from './src/processors';
 
 import { SanityCMSWebhook } from './src/types';
 
-export async function handler(req: Request<string>): Response {
+export async function handler(req: PostRequest): Response {
     const { body } = req;
 
     const data: SanityCMSWebhook = JSON.parse(body);
