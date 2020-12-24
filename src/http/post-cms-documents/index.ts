@@ -5,13 +5,11 @@ import { hasDocumentsToProcess, runDocumentProcessors } from './src/processors';
 
 import { SanityCMSWebhook } from './src/types';
 
-export async function handler(req: Request<SanityCMSWebhook>): Response {
+export async function handler(req: Request<string>): Response {
     const { body } = req;
 
-    const data = JSON.stringify(body);
-    const newData = JSON.parse(data);
-
-    const { projectId, ids } = newData;
+    const data: SanityCMSWebhook = JSON.parse(body);
+    const { transactionId, projectId, ids } = data;
 
     // 1. validate event based on project ID
     if (!isValidProject(projectId)) {
@@ -19,9 +17,10 @@ export async function handler(req: Request<SanityCMSWebhook>): Response {
         // Set proper response code and message
         return {
             statusCode: 200,
-            message: 'Invalid project ID',
             body: JSON.stringify({
-                providedId: projectId,
+                transactionId,
+                message: 'Invalid project ID. Shutting down.',
+                projectId,
             }),
         };
     }
@@ -30,8 +29,10 @@ export async function handler(req: Request<SanityCMSWebhook>): Response {
     if (!hasDocumentsToProcess(ids)) {
         return {
             statusCode: 200,
-            message: 'No documents to process.',
-            body: JSON.stringify({}),
+            body: JSON.stringify({
+                transactionId,
+                message: 'No documents to process. Shutting down',
+            }),
         };
     }
 
@@ -41,9 +42,10 @@ export async function handler(req: Request<SanityCMSWebhook>): Response {
 
     return {
         statusCode: 200,
-        message: 'All documents processed successfully.',
         body: JSON.stringify({
-            documents: ids,
+            transactionId,
+            message: 'All documents processed successfully.',
+            documentsProcessed: ids.all,
         }),
     };
 }
