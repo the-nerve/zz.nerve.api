@@ -2,6 +2,7 @@ import { PostRequest, Response } from '../../shared/global/types';
 
 import { isValidProject } from './src/validators';
 import { hasDocumentsToProcess, runDocumentProcessors } from './src/processors';
+import { getDocumentTypeMap } from './src/sanity';
 
 import { SanityCMSWebhook } from './src/types';
 
@@ -36,8 +37,12 @@ export async function handler(req: PostRequest): Response {
         };
     }
 
+    // ToDo: Clean up events that don't have any documents to process
+    // const cleanedDocumentEvents =
+
     // Get document types for each document to process
-    // const documentTypeMap = await getDocumentTypeMap(ids);
+    const documentTypeMap = await getDocumentTypeMap(ids);
+    console.log('FINAL DOCUMENT TYPE MAP:', documentTypeMap);
 
     // Document type map is what is passed in to runDocumentProcessors()
     // Update runDocumentProcessors() to use a switch/case check on each document: 'type'

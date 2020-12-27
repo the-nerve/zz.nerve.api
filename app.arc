@@ -7,4 +7,4 @@ folder public
 @http
 
 ## CMS API
-post /cms/documents
+post /cms/processWebhook
