@@ -1,8 +1,8 @@
 import { AvailableSanityDocumentType, DocumentID } from './sanity';
-import { AvailableSanityDocumentEvent } from './events';
+import { AvailableSanityActionableEvent } from './events';
 
 export type QueueItem = [
-    AvailableSanityDocumentEvent,
+    AvailableSanityActionableEvent,
     AvailableSanityDocumentType,
     DocumentID
 ];

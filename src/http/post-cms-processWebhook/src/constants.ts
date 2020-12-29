@@ -1,3 +1,5 @@
+import { AvailableSanityActionableEvent } from './types';
+
 /**
  * The events that Sanity sends over with its webhook.
  * Each of these events are sent as keys with the value
@@ -9,6 +11,15 @@ export enum SANITY_EVENTS {
     UPDATED = 'updated',
     ALL = 'all',
 }
+
+/**
+ *
+ */
+export const SANITY_ACTIONABLE_EVENTS: AvailableSanityActionableEvent[] = [
+    'created',
+    'deleted',
+    'updated',
+];
 
 /**
  *

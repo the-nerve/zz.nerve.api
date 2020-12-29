@@ -1,11 +1,14 @@
 import { Processors } from './processors';
 import { SanityDocumentEvents } from './sanity';
 
-export type AvailableSanityDocumentEvent = keyof SanityDocumentEvents;
+export type AvailableSanityActionableEvent = keyof Omit<
+    SanityDocumentEvents,
+    'all'
+>;
 export type AvailableSanityEventHook = 'onCreate' | 'onDelete' | 'onUpdate';
 
 export type EventHookMapping = [
-    AvailableSanityDocumentEvent,
+    AvailableSanityActionableEvent,
     AvailableSanityEventHook
 ];
 export type EventHookMappings = EventHookMapping[];

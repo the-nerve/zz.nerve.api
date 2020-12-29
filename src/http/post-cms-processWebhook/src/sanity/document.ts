@@ -1,14 +1,13 @@
 import { sanity } from './api';
 import {
-    AvailableSanityDocumentEvent,
+    AvailableSanityActionableEvent,
     AvailableSanityDocumentType,
     SanityDocumentEvents,
     DocumentID,
     QueueItem,
-    DocumentQueue,
 } from '../types';
-import { SANITY_EVENTS } from '../constants';
-import { enumToArray } from '../../../../shared/global/utils';
+import { SANITY_ACTIONABLE_EVENTS } from '../constants';
+import { asyncForEach } from '../../../../shared/utils';
 
 /**
  * Fetch a single document from Sanity based on the Document ID
@@ -21,21 +20,28 @@ const fetchDocumentType = async (
 ): Promise<AvailableSanityDocumentType> => {
     const query = '*[_id == $documentID]._type';
 
+    console.log(`Fetching type for document '${documentID}'...`);
+
     const { 0: documentType } = await sanity.fetch(query, { documentID });
+
+    console.log(`Document '${documentID}' has a type of '${documentType}'`);
 
     return documentType;
 };
 
 /**
+ * Build a queue of documents that need to be processed
  *
- * @param documents
- * @param eventName
+ * @param documents The ID of all of the documents within the current event that need to be processed
+ * @param eventName The name of the Sanity event we are currently working with
  */
 const createQueueItems = async (
     documents: DocumentID[],
-    eventName: AvailableSanityDocumentEvent
-): Promise<DocumentQueue> =>
-    Promise.all(
+    eventName: AvailableSanityActionableEvent
+): Promise<QueueItem[]> => {
+    console.log(`Building document queue for the '${eventName}' event...`);
+
+    return Promise.all(
         documents.map(
             async (documentID: DocumentID): Promise<QueueItem> => {
                 const documentType = await fetchDocumentType(documentID);
@@ -43,30 +49,38 @@ const createQueueItems = async (
             }
         )
     );
+};
 
 /**
  * Create a queue of documents that need to be processed. These documents
  * should be grouped with the triggering event, document type and document ID
  * This signature looks like [event, type, id]
  *
- * @param modifiedDocuments
+ * @param modifiedDocuments The documents that were modified according to the Sanity Webhook payload
  */
 export const buildDocumentQueue = async (
     modifiedDocuments: SanityDocumentEvents
-): Promise<DocumentQueue[]> => {
-    // Create array of sanity document events
-    const sanityEvents = enumToArray(
-        SANITY_EVENTS
-    ) as AvailableSanityDocumentEvent[];
+): Promise<QueueItem[]> => {
+    const queue: QueueItem[] = [];
 
-    return Promise.all(
-        sanityEvents.map(async (EVENT) => {
+    await asyncForEach(
+        SANITY_ACTIONABLE_EVENTS,
+        async (EVENT: AvailableSanityActionableEvent) => {
+            // Don't do any work on events with no modified documents
+            if (modifiedDocuments[EVENT].length === 0) {
+                console.log(
+                    `The '${EVENT}' event contains no documents to process and is being omitted.`
+                );
+                return;
+            }
+
             const queueItems = await createQueueItems(
                 modifiedDocuments[EVENT],
                 EVENT
             );
-
-            return queueItems;
-        })
+            queue.push(...queueItems);
+        }
     );
+
+    return queue;
 };

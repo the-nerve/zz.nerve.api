@@ -37,12 +37,9 @@ export async function handler(req: PostRequest): Response {
         };
     }
 
-    // ToDo: Clean up events that don't have any documents to process
-    // const cleanedDocumentEvents =
-
     // Get document types for each document to process
     const documentQueue = await buildDocumentQueue(ids);
-    console.log('FINAL DOCUMENT QUEUE:', documentQueue);
+    console.log('The queue is fully prepared for processing:', documentQueue);
 
     // Document type map is what is passed in to runDocumentProcessors()
     // Update runDocumentProcessors() to use a switch/case check on each document: 'type'
