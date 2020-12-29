@@ -7,6 +7,14 @@ export interface SanityDocumentEvents {
     all: DocumentID[] | [];
 }
 
+export type AvailableSanityDocumentType =
+    | 'artist'
+    | 'location'
+    | 'organization'
+    | 'season'
+    | 'show'
+    | 'sponsor';
+
 export interface SanityCMSWebhook {
     transactionId: string;
     projectId: string;

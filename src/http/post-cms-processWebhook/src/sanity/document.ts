@@ -1,42 +1,72 @@
 import { sanity } from './api';
-import { SanityDocumentEvents } from '../types';
+import {
+    AvailableSanityDocumentEvent,
+    AvailableSanityDocumentType,
+    SanityDocumentEvents,
+    DocumentID,
+    QueueItem,
+    DocumentQueue,
+} from '../types';
 import { SANITY_EVENTS } from '../constants';
 import { enumToArray } from '../../../../shared/global/utils';
 
-const fetchDocumentType = async (documentID) => {
+/**
+ * Fetch a single document from Sanity based on the Document ID
+ * and get the Type of that document
+ *
+ * @param documentID The ID of the document to get from Sanity
+ */
+const fetchDocumentType = async (
+    documentID: DocumentID
+): Promise<AvailableSanityDocumentType> => {
     const query = '*[_id == $documentID]._type';
 
     const { 0: documentType } = await sanity.fetch(query, { documentID });
+
     return documentType;
 };
 
-// TODO: Look into building a queue array with a tuple like [event, documentType, documentID] instead of re-creating an object map from this function. Then processing is a simple forEach loop instead of another nested loop
-export const getDocumentTypeMap = async (
-    documentEvents: SanityDocumentEvents
-): Promise<any> => {
-    const eventMap = {};
-
-    // Create array of sanity document events
-    const sanityEvents = enumToArray(SANITY_EVENTS);
-
-    // loop over each event in above array (forEach cannot use async/await)
-    for (const EVENT of sanityEvents) {
-        console.log(`About to map ${EVENT} document types`);
-
-        // Get tuple map of [documentID, documentType]
-        const map = await Promise.all(
-            documentEvents[EVENT].map(async (documentID) => {
+/**
+ *
+ * @param documents
+ * @param eventName
+ */
+const createQueueItems = async (
+    documents: DocumentID[],
+    eventName: AvailableSanityDocumentEvent
+): Promise<DocumentQueue> =>
+    Promise.all(
+        documents.map(
+            async (documentID: DocumentID): Promise<QueueItem> => {
                 const documentType = await fetchDocumentType(documentID);
-                return [documentID, documentType];
-            })
-        );
+                return [eventName, documentType, documentID];
+            }
+        )
+    );
 
-        // Only build an object reference for events that have documents
-        // Object will have a signature like {event: [documentID, documentType]}
-        if (documentEvents[EVENT].length > 0) {
-            eventMap[EVENT] = map;
-        }
-    }
+/**
+ * Create a queue of documents that need to be processed. These documents
+ * should be grouped with the triggering event, document type and document ID
+ * This signature looks like [event, type, id]
+ *
+ * @param modifiedDocuments
+ */
+export const buildDocumentQueue = async (
+    modifiedDocuments: SanityDocumentEvents
+): Promise<DocumentQueue[]> => {
+    // Create array of sanity document events
+    const sanityEvents = enumToArray(
+        SANITY_EVENTS
+    ) as AvailableSanityDocumentEvent[];
 
-    return eventMap;
+    return Promise.all(
+        sanityEvents.map(async (EVENT) => {
+            const queueItems = await createQueueItems(
+                modifiedDocuments[EVENT],
+                EVENT
+            );
+
+            return queueItems;
+        })
+    );
 };
