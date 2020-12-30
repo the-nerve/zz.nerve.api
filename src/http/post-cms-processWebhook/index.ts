@@ -11,10 +11,7 @@ export async function handler(req: PostRequest): Response {
     const data: SanityCMSWebhook = JSON.parse(body);
     const { transactionId, projectId, ids } = data;
 
-    // 1. validate event based on project ID
     if (!isValidProject(projectId)) {
-        // response is no bueno -- project ID check did not pass
-        // Set proper response code and message
         return {
             statusCode: 200,
             body: JSON.stringify({
@@ -25,7 +22,6 @@ export async function handler(req: PostRequest): Response {
         };
     }
 
-    // Check to see if there are documents that need to be processed
     if (!hasDocumentsToProcess(ids)) {
         return {
             statusCode: 200,
@@ -36,6 +32,7 @@ export async function handler(req: PostRequest): Response {
         };
     }
 
+    // Build & process the queue
     const documentQueue = await buildQueue(ids);
     processQueue(documentQueue);
 
