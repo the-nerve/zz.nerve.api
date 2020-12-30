@@ -21,3 +21,8 @@ export interface SanityCMSWebhook {
     dataset: string;
     ids: SanityDocumentEvents;
 }
+
+export type AvailableSanityActionableEvent = keyof Omit<
+    SanityDocumentEvents,
+    'all'
+>;

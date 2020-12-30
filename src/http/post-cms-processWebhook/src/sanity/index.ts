@@ -1,3 +1,3 @@
-export * from './document';
-export * from './season';
-export * from './show';
+export * from './api';
+export * from './documents/season';
+export * from './documents/show';

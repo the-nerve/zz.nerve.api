@@ -1,5 +1,5 @@
 // import { sanity } from './api';
-import { Processor } from '../types';
+import { Processor, DocumentTypeProcessorsMap } from '../../types';
 
 /**
  * Retrieve all available performance dates from the show
@@ -39,6 +39,19 @@ import { Processor } from '../types';
  */
 // const shouldOpenOrCloseDatesChange = () => {};
 
+export const attachShowToSeason: Processor<void> = (documentID) => {
+    return documentID;
+};
+
 export const updateOpenAndCloseDates: Processor<void> = (documentID) => {
-    console.log(`Running updateOpenAndCloseDates on ${documentID}`);
+    return documentID;
+};
+
+/**
+ * Build a map of processors for this document type
+ */
+export const showProcessors: DocumentTypeProcessorsMap = {
+    created: [updateOpenAndCloseDates, attachShowToSeason],
+    updated: [updateOpenAndCloseDates, attachShowToSeason],
+    deleted: [],
 };

@@ -13,19 +13,13 @@ export enum SANITY_EVENTS {
 }
 
 /**
- *
+ * An array of events that we want to take action on. This purposefully does
+ * not include the "all" event, as we don't have any need to iterate on it
+ * at present. All processing for each document type is handled on one the
+ * of the three events below.
  */
 export const SANITY_ACTIONABLE_EVENTS: AvailableSanityActionableEvent[] = [
     'created',
     'deleted',
     'updated',
 ];
-
-/**
- *
- */
-export enum SANITY_EVENT_HOOKS {
-    ON_CREATE = 'onCreate',
-    ON_DELETE = 'onDelete',
-    ON_UPDATE = 'onUpdate',
-}

@@ -1,4 +1,5 @@
-import { sanity } from './api';
+import { sanity } from '../sanity';
+
 import {
     AvailableSanityActionableEvent,
     AvailableSanityDocumentType,
@@ -6,6 +7,7 @@ import {
     DocumentID,
     QueueItem,
 } from '../types';
+
 import { SANITY_ACTIONABLE_EVENTS } from '../constants';
 import { asyncForEach } from '../../../../shared/utils';
 
@@ -24,10 +26,10 @@ const fetchDocumentType = async (
 
     const { 0: documentType } = await sanity
         .fetch(query, { documentID })
-        .catch((err) =>
+        .catch((error) =>
             console.log(
                 'Error encountered while attempting to fetch Document Type from the Sanity API: ',
-                err
+                error
             )
         );
 
@@ -62,20 +64,23 @@ const createQueueItems = async (
 /**
  * Create a queue of documents that need to be processed. These documents
  * should be grouped with the triggering event, document type and document ID
- * This signature looks like [event, type, id]
  *
- * @param modifiedDocuments The documents that were modified according to the Sanity Webhook payload
+ * @param documentEvents The documents that were modified according to the Sanity Webhook payload
  */
-export const buildDocumentQueue = async (
-    modifiedDocuments: SanityDocumentEvents
+export const buildQueue = async (
+    documentEvents: SanityDocumentEvents
 ): Promise<QueueItem[]> => {
+    console.log('---------');
+    console.log('Starting to build the queue...');
+    console.log('---------');
+
     const queue: QueueItem[] = [];
 
     await asyncForEach(
         SANITY_ACTIONABLE_EVENTS,
         async (EVENT: AvailableSanityActionableEvent) => {
             // Don't do any work on events with no modified documents
-            if (modifiedDocuments[EVENT].length === 0) {
+            if (documentEvents[EVENT].length === 0) {
                 console.log(
                     `The '${EVENT}' event contains no documents to process and is being omitted.`
                 );
@@ -83,11 +88,17 @@ export const buildDocumentQueue = async (
             }
 
             const queueItems = await createQueueItems(
-                modifiedDocuments[EVENT],
+                documentEvents[EVENT],
                 EVENT
             );
             queue.push(...queueItems);
         }
+    );
+
+    console.log(`------------`);
+    console.log(
+        'The queue has been built and is prepared for processing: ',
+        queue
     );
 
     return queue;
