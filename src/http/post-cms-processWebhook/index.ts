@@ -36,15 +36,7 @@ export async function handler(req: PostRequest): Response {
         };
     }
 
-    // Get document types for each document to process
     const documentQueue = await buildQueue(ids);
-
-    // Document type map is what is passed in to runDocumentProcessors()
-    // Update runDocumentProcessors() to use a switch/case check on each document: 'type'
-    // Then assign processors for a specific document type within the case for the document type we are targeting.
-
-    // 3. For each array of events, check to see if we have a processor in place
-    // -- each event type probably needs an array of "processors" that should be fired on each event
     processQueue(documentQueue);
 
     return {
