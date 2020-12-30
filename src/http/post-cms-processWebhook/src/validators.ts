@@ -15,11 +15,11 @@ export const isValidProject = (projectId: string): boolean => {
 
     if (projectId === process.env.SANITY_PROJECT_ID) {
         console.log(
-            `Provided Project ID ${projectId} is a valid Sanity Project.`
+            `Provided Project ID '${projectId}' is a valid Sanity Project.`
         );
         return true;
     }
 
-    console.log(`Provided Project ID ${projectId} is invalid.`);
+    console.log(`Provided Project ID '${projectId}' is invalid.`);
     return false;
 };

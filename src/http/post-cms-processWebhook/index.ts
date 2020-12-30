@@ -47,7 +47,7 @@ export async function handler(req: PostRequest): Response {
 
     // 3. For each array of events, check to see if we have a processor in place
     // -- each event type probably needs an array of "processors" that should be fired on each event
-    runDocumentProcessors(ids);
+    runDocumentProcessors(documentQueue);
 
     return {
         statusCode: 200,

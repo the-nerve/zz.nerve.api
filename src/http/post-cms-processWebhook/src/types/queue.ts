@@ -1,10 +1,8 @@
 import { AvailableSanityDocumentType, DocumentID } from './sanity';
 import { AvailableSanityActionableEvent } from './events';
 
-export type QueueItem = [
-    AvailableSanityActionableEvent,
-    AvailableSanityDocumentType,
-    DocumentID
-];
-
-export type DocumentQueue = QueueItem[];
+export interface QueueItem {
+    eventName: AvailableSanityActionableEvent;
+    documentType: AvailableSanityDocumentType;
+    documentID: DocumentID;
+}

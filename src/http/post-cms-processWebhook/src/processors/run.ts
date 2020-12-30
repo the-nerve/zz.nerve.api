@@ -5,6 +5,7 @@ import {
     EventHookMappings,
     EventProcessors,
     AvailableSanityEventHook,
+    QueueItem,
 } from '../types';
 
 import {
@@ -37,25 +38,31 @@ const eventHookMappings: EventHookMappings = [
  * @param {*} hookName
  * @param {*} documents
  */
-const maybeRunProcessor = (
-    hookName: AvailableSanityEventHook,
-    documentIDs: DocumentID[]
-) => {
-    if (hasProcessorsToRunOnHook(processors[hookName], hookName)) {
-        documentIDs.forEach((documentID) => {
-            processors[hookName].forEach((processor) => processor(documentID));
-        });
-    }
+const maybeRunProcessor = (document: QueueItem) => {};
+
+/**
+ *
+ * @param queueItem
+ * @param processors
+ */
+const runEventHookProcessorsOnType = (queueItem: QueueItem, processors) => {};
+
+/**
+ *
+ * @param queueItem
+ */
+const selectDocumentTypeProcessors = (queueItem: QueueItem) => {
+    // use the current queue item document type to check for processors to run
+    // if there are processors to run, then we need to check the given eventName to see if there are processors to run
+    // If there are processors to run, we need to run the processors specific to this documentType and eventName
 };
 
 /**
  *
  * @param {*} documents
  */
-export const runDocumentProcessors = (
-    documents: SanityDocumentEvents
-): void => {
-    eventHookMappings.forEach(([EVENT, HOOK]) =>
-        maybeRunProcessor(HOOK, documents[EVENT])
-    );
+export const runDocumentProcessors = (queue: QueueItem[]): void => {
+    queue.forEach((item) => {
+        const processors = selectDocumentTypeProcessors(item);
+    });
 };

@@ -22,7 +22,14 @@ const fetchDocumentType = async (
 
     console.log(`Fetching type for document '${documentID}'...`);
 
-    const { 0: documentType } = await sanity.fetch(query, { documentID });
+    const { 0: documentType } = await sanity
+        .fetch(query, { documentID })
+        .catch((err) =>
+            console.log(
+                'Error encountered while attempting to fetch Document Type from the Sanity API: ',
+                err
+            )
+        );
 
     console.log(`Document '${documentID}' has a type of '${documentType}'`);
 
@@ -45,7 +52,8 @@ const createQueueItems = async (
         documents.map(
             async (documentID: DocumentID): Promise<QueueItem> => {
                 const documentType = await fetchDocumentType(documentID);
-                return [eventName, documentType, documentID];
+                console.log(`Adding document '${documentID}' to the queue.`);
+                return { eventName, documentType, documentID };
             }
         )
     );
