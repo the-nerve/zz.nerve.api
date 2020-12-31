@@ -13,8 +13,8 @@ export interface QueueItem {
 
 export type Queue = QueueItem[];
 
-export type Processor<T = any> = (documentID: DocumentID) => T;
-export type Processors<T = any> = Processor<T>[];
+export type Processor = (documentID: DocumentID) => Promise<void>;
+export type Processors = Processor[];
 
 export interface DocumentTypeProcessorsMap {
     [SANITY_EVENTS.CREATED]: Processors | undefined[];

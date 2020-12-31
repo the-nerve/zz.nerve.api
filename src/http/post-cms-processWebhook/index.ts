@@ -34,7 +34,7 @@ export async function handler(req: PostRequest): Response {
 
     // Build & process the queue
     const documentQueue = await buildQueue(ids);
-    processQueue(documentQueue);
+    await processQueue(documentQueue);
 
     return {
         statusCode: 200,

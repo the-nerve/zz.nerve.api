@@ -4,8 +4,10 @@ import {
     Queue,
     Processors,
     DocumentTypeProcessorsMap,
+    Processor,
 } from '../types';
 import { showProcessors } from '../sanity';
+import { asyncForEach } from '../../../../shared/utils';
 
 /**
  *
@@ -46,18 +48,21 @@ const selectDocumentTypeProcessors = (
  * @param processors
  * @param queueItem
  */
-const processQueueItem = (processors: Processors, queueItem: QueueItem) => {
+const processQueueItem = async (
+    processors: Processors,
+    queueItem: QueueItem
+) => {
     const { eventName, documentID } = queueItem;
 
     console.log(
         `There are ${processors.length} '${eventName}' event processors to run on document ${documentID}'...`
     );
 
-    processors.forEach((processor) => {
+    await asyncForEach(processors, async (processor: Processor) => {
         console.log(
             `Running function '${processor.name}' on document ${documentID}`
         );
-        processor(documentID);
+        await processor(documentID);
     });
 };
 
@@ -65,12 +70,12 @@ const processQueueItem = (processors: Processors, queueItem: QueueItem) => {
  *
  * @param queue
  */
-export const processQueue = (queue: Queue) => {
+export const processQueue = async (queue: Queue) => {
     console.log(`------------`);
     console.log(`Starting to process the queue...`);
     console.log(`------------`);
 
-    queue.forEach((queueItem) => {
+    await asyncForEach(queue, async (queueItem: QueueItem) => {
         const { eventName, documentType } = queueItem;
 
         const typeProcessors = selectDocumentTypeProcessors(documentType);
@@ -82,7 +87,7 @@ export const processQueue = (queue: Queue) => {
             return null;
         }
 
-        processQueueItem(typeProcessors[eventName], queueItem);
+        await processQueueItem(typeProcessors[eventName], queueItem);
     });
 
     console.log('---------');

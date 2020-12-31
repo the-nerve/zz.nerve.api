@@ -26,3 +26,22 @@ export type AvailableSanityActionableEvent = keyof Omit<
     SanityDocumentEvents,
     'all'
 >;
+
+/**
+ * Show types
+ */
+export interface RawShowPerformanceDates {
+    performances: string[];
+    openDate: string;
+    closeDate: string;
+}
+
+export interface ShowPerformanceDates {
+    performances: Date[];
+    openDate: Date;
+    closeDate: Date;
+}
+
+/**
+ * Season types
+ */

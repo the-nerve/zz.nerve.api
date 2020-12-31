@@ -28,7 +28,8 @@
   "dependencies": {
     "@architect/architect": "^8.4.4",
     "@sanity/client": "^2.1.0",
-    "@sentry/serverless": "^5.29.2"
+    "@sentry/serverless": "^5.29.2",
+    "date-fns": "^2.16.1"
   },
   "devDependencies": {
     "@architect/sandbox": "^3.3",
