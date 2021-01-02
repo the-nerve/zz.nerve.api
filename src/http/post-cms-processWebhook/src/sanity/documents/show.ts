@@ -1,60 +1,74 @@
-import compareAsc from 'date-fns/compareAsc';
+/**
+ * Sanity Document Type: Show
+ * Description: This file contains all processing functions related to shows.
+ */
+import { compareAsc, isEqual } from 'date-fns';
 import { sanity } from '../api';
 import {
     Processor,
     DocumentTypeProcessorsMap,
     DocumentID,
-    RawShowPerformanceDates,
-    ShowPerformanceDates,
+    RawPerformanceDates,
+    PerformanceDates,
+    RawShowDates,
+    ShowDates,
 } from '../../types';
 
 /**
- * Retrieve all available performance dates from the show
- *
+ * Retrieve all available date information from the show
  * @param {string} documentID
  */
-export const getPerformanceDates = async (documentID: DocumentID) => {
+const getPerformanceDates = async (documentID: DocumentID) => {
     const query =
         "*[_type == 'show' && _id == $documentID][0] {'performances': performances[].datetime, openDate, closeDate}";
     const params = { documentID };
-    const rawPerformanceDates: RawShowPerformanceDates = await sanity.fetch(
-        query,
-        params
-    );
+    const rawPerformanceDates: RawShowDates = await sanity.fetch(query, params);
 
-    console.log(rawPerformanceDates);
     return rawPerformanceDates;
 };
 
 /**
  * Does the show have any performances available?
- * @param {*} performances
+ * @param performances An array of the available performance dates
  */
-const hasPerformances = (performances: string[]) => performances.length > 0;
+const hasPerformances = (performances: RawPerformanceDates) =>
+    performances.length > 0;
 
+/**
+ * Sanity returns dates as strings, so we need to convert all of the the
+ * date strings to date objects
+ *
+ * @param rawShowDates stringified version of all show-related dates
+ */
 const generatePerformanceDateObjects = ({
     performances,
     openDate,
     closeDate,
-}: RawShowPerformanceDates): ShowPerformanceDates => {
+}: RawShowDates): ShowDates => {
     return {
         performances: performances.map((performance) => new Date(performance)),
-        openDate: new Date(openDate),
-        closeDate: new Date(closeDate),
+        previousOpenDate: new Date(openDate),
+        previousCloseDate: new Date(closeDate),
     };
 };
 
 /**
- * Sort shows from the first performance to the last in Ascending order
+ * Sort shows from the first performance to the last (in ascending order)
+ * @param performances An array of performance date objects
  */
-export const sortPerformancesFromFirstToLast = (
-    performances
-): ShowPerformanceDates => performances.sort(compareAsc);
+const sortPerformancesAscending = (
+    performances: PerformanceDates
+): PerformanceDates => {
+    return performances.sort(compareAsc);
+};
 
 /**
- * Get the first performance and the last performance from a performances array
+ * Get the first performance and the last performance dates from an array
+ * of performance dates.
+ *
+ * @param
  */
-export const getFirstAndLastPerformances = (performances) => {
+const getFirstAndLastPerformances = (performances: PerformanceDates) => {
     const {
         length,
         0: firstPerformance,
@@ -68,47 +82,111 @@ export const getFirstAndLastPerformances = (performances) => {
 };
 
 /**
- * Looking at the
+ * Are either of the previous open or close dates
+ * different from the first and last performance dates?
+ *
+ * @param previousOpenDate
+ * @param previousCloseDate
+ * @param firstPerformance
+ * @param lastPerformance
  */
-// const shouldOpenOrCloseDatesChange = () => {};
+const shouldUpdateOpenOrCloseDates = (
+    previousOpenDate,
+    previousCloseDate,
+    firstPerformance,
+    lastPerformance
+) =>
+    !isEqual(previousOpenDate, firstPerformance) ||
+    !isEqual(previousCloseDate, lastPerformance);
+
+/**
+ *
+ */
+const maybeGetNewOpenDate = (openDate, firstPerformance) => {
+    if (isEqual(firstPerformance, openDate)) {
+        console.log(
+            'The opening date for this show is unchanged and will not be updated.'
+        );
+        return {};
+    }
+
+    return { openDate: firstPerformance };
+};
+
+const maybeGetNewCloseDate = (closeDate, lastPerformance) => {
+    if (isEqual(lastPerformance, closeDate)) {
+        console.log(
+            'The closing date for this show is unchanged and will not be updated.'
+        );
+        return {};
+    }
+
+    return { closeDate: lastPerformance };
+};
 
 // export const attachShowToSeason: Processor = async (documentID) => {};
 
-export const updateOpenAndCloseDates: Processor = async (documentID) => {
-    const rawPerformanceDates = await getPerformanceDates(documentID);
-    if (!hasPerformances(rawPerformanceDates.performances)) {
+/**
+ *
+ * @param documentID
+ */
+export const maybeUpdateOpenAndCloseDates: Processor = async (documentID) => {
+    const rawShowDates = await getPerformanceDates(documentID);
+
+    if (!hasPerformances(rawShowDates.performances)) {
         return null;
     }
-    const { performances } = generatePerformanceDateObjects(
-        rawPerformanceDates
-    );
 
-    const sortedPerformances = sortPerformancesFromFirstToLast(performances);
-    console.log(sortedPerformances);
-    // https://twitter.com/wesbos/status/1187745700320337920?lang=en
+    const {
+        performances,
+        previousOpenDate,
+        previousCloseDate,
+    } = generatePerformanceDateObjects(rawShowDates);
+
+    const sortedPerformances = sortPerformancesAscending(performances);
+
     const { firstPerformance, lastPerformance } = getFirstAndLastPerformances(
         sortedPerformances
     );
 
+    if (
+        !shouldUpdateOpenOrCloseDates(
+            previousOpenDate,
+            previousCloseDate,
+            firstPerformance,
+            lastPerformance
+        )
+    ) {
+        console.log(
+            'Open and Close dates are unchanged. No additional action will be taken.'
+        );
+        return null;
+    }
+
+    // Sanity mutation API docs: https://www.sanity.io/docs/http-mutations
     await sanity
         .patch(documentID)
-        .set({ openDate: firstPerformance })
-        .set({ closeDate: lastPerformance })
-        .commit() // Perform the patch and return a promise
+        .set(maybeGetNewOpenDate(previousOpenDate, firstPerformance))
+        .set(maybeGetNewCloseDate(previousCloseDate, lastPerformance))
+        .commit()
         .then((updatedShow) => {
-            console.log('Hurray, the show is updated! New document:');
-            console.log(updatedShow);
+            console.log(
+                `Hooray! The show '${updatedShow.title}' with ID '${documentID}' was successfully updated!`
+            );
         })
         .catch((err) => {
-            console.error('Oh no, the update failed: ', err.message);
+            console.error(
+                `Oh no, the show with ID ${documentID} failed to update: `,
+                err.message
+            );
         });
 };
 
 /**
- * Build a map of processors for this document type
+ * Build a final map of processors for this document type
  */
 export const showProcessors: DocumentTypeProcessorsMap = {
-    created: [updateOpenAndCloseDates],
-    updated: [updateOpenAndCloseDates],
+    created: [maybeUpdateOpenAndCloseDates],
+    updated: [maybeUpdateOpenAndCloseDates],
     deleted: [],
 };

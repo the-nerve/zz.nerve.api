@@ -30,16 +30,19 @@ export type AvailableSanityActionableEvent = keyof Omit<
 /**
  * Show types
  */
-export interface RawShowPerformanceDates {
-    performances: string[];
+export type RawPerformanceDates = string[];
+export type PerformanceDates = Date[];
+
+export interface RawShowDates {
+    performances: RawPerformanceDates;
     openDate: string;
     closeDate: string;
 }
 
-export interface ShowPerformanceDates {
-    performances: Date[];
-    openDate: Date;
-    closeDate: Date;
+export interface ShowDates {
+    performances: PerformanceDates;
+    previousOpenDate: Date;
+    previousCloseDate: Date;
 }
 
 /**

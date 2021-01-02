@@ -1,3 +1,5 @@
+import arc from '@architect/functions';
+
 import { PostRequest, Response } from '../../shared/global/types';
 
 import { isValidProject, hasDocumentsToProcess } from './src/conditions';
@@ -5,10 +7,11 @@ import { buildQueue, processQueue } from './src/queue';
 
 import { SanityCMSWebhook } from './src/types';
 
-export async function handler(req: PostRequest): Response {
-    const { body } = req;
+const parseBody = arc.http.helpers.bodyParser;
 
-    const data: SanityCMSWebhook = JSON.parse(body);
+export async function handler(req: PostRequest): Response {
+    const data: SanityCMSWebhook = parseBody(req);
+
     const { transactionId, projectId, ids } = data;
 
     if (!isValidProject(projectId)) {

@@ -1,6 +1,9 @@
 @app
 nerve-api
 
+@aws
+timeout 30
+
 @static
 folder public
 
