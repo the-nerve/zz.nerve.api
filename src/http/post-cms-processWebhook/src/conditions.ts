@@ -1,4 +1,4 @@
-import { SanityDocumentEvents } from './types';
+import { SanityDocumentEvents } from './types/sanity';
 import { SANITY_EVENTS } from './constants';
 
 /**

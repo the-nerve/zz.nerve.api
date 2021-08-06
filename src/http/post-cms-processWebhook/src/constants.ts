@@ -1,4 +1,4 @@
-import { AvailableSanityActionableEvent } from './types';
+import { AvailableSanityActionableEvent } from './types/sanity';
 
 /**
  * The events that Sanity sends over with its webhook.
