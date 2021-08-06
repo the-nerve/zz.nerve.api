@@ -23,7 +23,7 @@
     "lint": "eslint . --cache --cache-location node_modules/.cache/eslint --ext ts",
     "lint:fix": "eslint . --cache --cache-location node_modules/.cache/eslint --ext ts --fix",
     "lint:clean": "rimraf node_modules/.cache/eslint",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo 'Error: no test specified'"
   },
   "dependencies": {
     "@architect/architect": "^8.4.4",
