@@ -1,8 +1,7 @@
-// https://www.npmjs.com/package/@sanity/client
 import sanityClient from '@sanity/client';
 
 /**
- *
+ * The Official Sanity Client for interacting with the Sanity API
  */
 export const sanity = sanityClient({
     projectId: process.env.SANITY_PROJECT_ID,

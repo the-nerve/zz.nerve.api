@@ -1,4 +1,4 @@
-export interface Request<TBody = Record<string, unknown>> {
+export interface PostRequest {
     version: string;
     routeKey: string;
     rawPath: string;
@@ -13,5 +13,5 @@ export interface Request<TBody = Record<string, unknown>> {
         };
         routeKey: string;
     };
-    body: TBody;
+    body: string;
 }

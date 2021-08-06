@@ -1,5 +1,8 @@
 @app
-begin-app
+nerve-api
+
+@aws
+timeout 30
 
 @static
 folder public
@@ -7,4 +10,4 @@ folder public
 @http
 
 ## CMS API
-post /cms/documents
+post /cms/processWebhook
